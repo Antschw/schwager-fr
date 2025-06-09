@@ -74,3 +74,22 @@ export async function findUserById(id: string) {
     const {password, ...userWithoutPassword} = user;
     return userWithoutPassword;
 }
+
+/**
+ * Gets all users from the database.
+ * @returns Array of user objects without passwords.
+ */
+export async function getAllUsers() {
+    const users = await prisma.user.findMany({
+        orderBy: {
+            createdAt: 'desc', // Most recent first
+        },
+    });
+
+    // Remove passwords from all users
+    return users.map(user => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const {password, ...userWithoutPassword} = user;
+        return userWithoutPassword;
+    });
+}

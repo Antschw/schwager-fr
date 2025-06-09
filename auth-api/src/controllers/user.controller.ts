@@ -1,5 +1,22 @@
 import {Request, Response} from 'express';
-import {createUser, deleteUser, findUserByEmail} from '../services/user.service';
+import {createUser, deleteUser, findUserByEmail, getAllUsers} from '../services/user.service';
+
+/**
+ * Handles the get all users request.
+ */
+export const getAllUsersHandler = async (_req: Request, res: Response) => {
+    try {
+        const users = await getAllUsers();
+        return res.status(200).json({
+            message: 'Users retrieved successfully',
+            users,
+            count: users.length,
+        });
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        return res.status(500).json({message: 'Internal server error'});
+    }
+};
 
 /**
  * Handles the user creation request.

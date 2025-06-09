@@ -1,11 +1,20 @@
 import express from 'express';
-import {createUserHandler, deleteUserHandler} from '../controllers/user.controller';
+import {createUserHandler, deleteUserHandler, getAllUsersHandler} from '../controllers/user.controller';
 import validate from '../middleware/validate.middleware';
 import {createUserSchema} from '../schemas/user.schema';
 import {requireAuth, requireRole} from '../middleware/auth.middleware';
 import {Role} from '@prisma/client';
 
 const router = express.Router();
+
+// Get all users (only accessible by ADMIN)
+router.get(
+    '/',
+    requireAuth,
+    requireRole(Role.ADMIN),
+    getAllUsersHandler
+);
+
 
 // Create a new user (only accessible by ADMIN)
 router.post(

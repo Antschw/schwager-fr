@@ -347,10 +347,10 @@
         }
       }
     },
-    "/users/{id}": {
-      "delete": {
-        "summary": "Delete a user (Admin only)",
-        "description": "Deletes a user from the system by their ID. This operation is restricted to users with the ADMIN role. Admins cannot delete their own account.",
+    "/users": {
+      "get": {
+        "summary": "Get all users (Admin only)",
+        "description": "Retrieves a list of all users in the system. This operation is restricted to users with the ADMIN role. Users are returned ordered by creation date (most recent first) and passwords are excluded for security.",
         "tags": [
           "Users"
         ],
@@ -359,21 +359,9 @@
             "cookieAuth": []
           }
         ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier of the user to delete",
-            "schema": {
-              "type": "string",
-              "example": "cm789ghi012"
-            }
-          }
-        ],
         "responses": {
           "200": {
-            "description": "User deleted successfully",
+            "description": "Users retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -381,38 +369,69 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "User deleted successfully",
-                      "description": "User deletion confirmation message"
+                      "example": "Users retrieved successfully",
+                      "description": "Success message"
                     },
-                    "user": {
-                      "$ref": "#/components/schemas/User"
+                    "users": {
+                      "type": "array",
+                      "description": "Array of user objects (ordered by creation date, most recent first)",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    },
+                    "count": {
+                      "type": "integer",
+                      "description": "Total number of users returned",
+                      "example": 3,
+                      "minimum": 0
                     }
                   }
                 },
-                "example": {
-                  "message": "User deleted successfully",
-                  "user": {
-                    "id": "cm789ghi012",
-                    "email": "user@example.com",
-                    "firstName": "Jane",
-                    "lastName": "Smith",
-                    "role": "USER",
-                    "createdAt": "2024-01-15T12:00:00.000Z",
-                    "updatedAt": "2024-01-15T12:00:00.000Z"
+                "examples": {
+                  "multiple_users": {
+                    "summary": "Multiple users response",
+                    "value": {
+                      "message": "Users retrieved successfully",
+                      "users": [
+                        {
+                          "id": "cm789ghi012",
+                          "email": "newuser@example.com",
+                          "firstName": "Jane",
+                          "lastName": "Smith",
+                          "role": "USER",
+                          "createdAt": "2024-01-15T14:00:00.000Z",
+                          "updatedAt": "2024-01-15T14:00:00.000Z"
+                        },
+                        {
+                          "id": "cm456def789",
+                          "email": "user@example.com",
+                          "firstName": "John",
+                          "lastName": "Doe",
+                          "role": "USER",
+                          "createdAt": "2024-01-15T12:00:00.000Z",
+                          "updatedAt": "2024-01-15T12:00:00.000Z"
+                        },
+                        {
+                          "id": "cm123abc456",
+                          "email": "admin@example.com",
+                          "firstName": "Admin",
+                          "lastName": "User",
+                          "role": "ADMIN",
+                          "createdAt": "2024-01-15T10:30:00.000Z",
+                          "updatedAt": "2024-01-15T10:30:00.000Z"
+                        }
+                      ],
+                      "count": 3
+                    }
+                  },
+                  "empty_response": {
+                    "summary": "No users found",
+                    "value": {
+                      "message": "Users retrieved successfully",
+                      "users": [],
+                      "count": 0
+                    }
                   }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request - Cannot delete own account",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "example": {
-                  "message": "You cannot delete your own account."
                 }
               }
             }
@@ -443,19 +462,6 @@
               }
             }
           },
-          "404": {
-            "description": "User not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "example": {
-                  "message": "User not found."
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -470,9 +476,7 @@
             }
           }
         }
-      }
-    },
-    "/users": {
+      },
       "post": {
         "summary": "Create a new user (Admin only)",
         "description": "Creates a new user in the system. This operation is restricted to users with the ADMIN role. Passwords are automatically hashed using Argon2.",
@@ -640,6 +644,131 @@
                 },
                 "example": {
                   "message": "An account with this email already exists."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Internal server error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "delete": {
+        "summary": "Delete a user (Admin only)",
+        "description": "Deletes a user from the system by their ID. This operation is restricted to users with the ADMIN role. Admins cannot delete their own account.",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the user to delete",
+            "schema": {
+              "type": "string",
+              "example": "cm789ghi012"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User deleted successfully",
+                      "description": "User deletion confirmation message"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "User deleted successfully",
+                  "user": {
+                    "id": "cm789ghi012",
+                    "email": "user@example.com",
+                    "firstName": "Jane",
+                    "lastName": "Smith",
+                    "role": "USER",
+                    "createdAt": "2024-01-15T12:00:00.000Z",
+                    "updatedAt": "2024-01-15T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Cannot delete own account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "You cannot delete your own account."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions (ADMIN role required)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Forbidden: Insufficient permissions"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "User not found."
                 }
               }
             }
