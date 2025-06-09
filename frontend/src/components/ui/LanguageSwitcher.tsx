@@ -2,7 +2,7 @@ import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
-export const LanguageSwitcher = () => {
+export default function LanguageSwitcher() {
     const { i18n, t } = useTranslation();
 
     const languages = [
@@ -25,7 +25,7 @@ export const LanguageSwitcher = () => {
             <Dropdown>
                 <DropdownTrigger>
                     <Button
-                        variant="ghost"
+                        variant="light"
                         size="sm"
                         className="text-default-500 hover:text-default-700"
                         startContent={
@@ -57,4 +57,4 @@ export const LanguageSwitcher = () => {
             </Dropdown>
         </motion.div>
     );
-};
+}

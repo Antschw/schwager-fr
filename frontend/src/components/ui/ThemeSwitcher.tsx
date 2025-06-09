@@ -2,8 +2,9 @@ import { useTheme } from '@heroui/use-theme'
 import { Button } from '@heroui/react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
+import { Icon } from '@iconify/react'
 
-export const ThemeSwitcher = () => {
+export default function ThemeSwitcher() {
     const { theme, setTheme } = useTheme()
     const { t } = useTranslation()
 
@@ -15,25 +16,24 @@ export const ThemeSwitcher = () => {
         >
             <Button
                 isIconOnly
-                variant="ghost"
+                variant="light"
                 onPress={() => setTheme(theme === 'light' ? 'dark' : 'light')}
                 aria-label={
                     theme === 'light' ? t('common.darkMode') : t('common.lightMode')
                 }
-                className="
-          text-gray-600 dark:text-gray-300
-          hover:text-gray-800 dark:hover:text-gray-100
-          transition-colors duration-300
-        "
+                className="text-default-500 hover:text-default-700"
             >
-                <motion.span
+                <motion.div
                     key={theme}
                     initial={{ rotate: 0 }}
                     animate={{ rotate: 360 }}
                     transition={{ duration: 0.5 }}
                 >
-                    {theme === 'light' ? '🌙' : '☀️'}
-                </motion.span>
+                    <Icon
+                        icon={theme === 'light' ? "lucide:moon" : "lucide:sun"}
+                        className="w-5 h-5"
+                    />
+                </motion.div>
             </Button>
         </motion.div>
     )

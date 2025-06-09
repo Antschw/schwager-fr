@@ -14,13 +14,18 @@
     "successMessage": "Authentication successful",
     "welcomeBack": "Welcome back to your account"
   },
+  "hub": {
+    "welcome": "Welcome to the Hub",
+    "description": "This is your personal space"
+  },
   "common": {
     "siteName": "schwager.fr",
     "lightMode": "Light mode",
     "darkMode": "Dark mode",
     "language": "Language",
     "french": "French",
-    "english": "English"
+    "english": "English",
+    "logout": "Logout"
   },
   "errors": {
     "networkError": "Network error. Please try again.",
