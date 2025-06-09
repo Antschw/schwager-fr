@@ -1,4 +1,4 @@
-/// <reference types="express" />
+/// <reference types="src/types/express" />
 import { User as PrismaUser } from '@prisma/client';
 
 declare global {
