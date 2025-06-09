@@ -1,0 +1,764 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Auth API",
+    "version": "1.0.0",
+    "description": "Complete authentication and user management API with JWT tokens, role-based access control, and secure cookie authentication.",
+    "contact": {
+      "name": "API Support",
+      "email": "support@example.com"
+    },
+    "license": {
+      "name": "ISC",
+      "url": "https://opensource.org/licenses/ISC"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://schwager.fr/auth-api",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:4000/auth-api",
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Authentication operations (login, logout, user profile)"
+    },
+    {
+      "name": "Users",
+      "description": "User management operations (creation, modification - admin only)"
+    },
+    {
+      "name": "Health",
+      "description": "API health check operations"
+    }
+  ],
+  "paths": {
+    "/healthcheck": {
+      "get": {
+        "summary": "API health check",
+        "description": "Simple endpoint to verify that the API is running correctly.",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "API is operational",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "OK"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Authenticate a user",
+        "description": "Authenticates a user with email and password. On success, sets secure cookies with access and refresh tokens.",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "User login credentials",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              },
+              "examples": {
+                "admin": {
+                  "summary": "Admin login",
+                  "value": {
+                    "email": "admin@example.com",
+                    "password": "AdminPassword123!"
+                  }
+                },
+                "user": {
+                  "summary": "Standard user login",
+                  "value": {
+                    "email": "user@example.com",
+                    "password": "UserPassword123!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Authentication cookies (accessToken and refreshToken)",
+                "schema": {
+                  "type": "string",
+                  "example": "accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Secure; SameSite=Strict; Max-Age=900"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                },
+                "examples": {
+                  "admin_login": {
+                    "summary": "Admin login response",
+                    "value": {
+                      "message": "Login successful",
+                      "user": {
+                        "id": "cm123abc456",
+                        "email": "admin@example.com",
+                        "firstName": "Admin",
+                        "lastName": "User",
+                        "role": "ADMIN",
+                        "createdAt": "2024-01-15T10:30:00.000Z",
+                        "updatedAt": "2024-01-15T10:30:00.000Z"
+                      }
+                    }
+                  },
+                  "user_login": {
+                    "summary": "Standard user login response",
+                    "value": {
+                      "message": "Login successful",
+                      "user": {
+                        "id": "cm456def789",
+                        "email": "user@example.com",
+                        "firstName": "John",
+                        "lastName": "Doe",
+                        "role": "USER",
+                        "createdAt": "2024-01-15T10:30:00.000Z",
+                        "updatedAt": "2024-01-15T10:30:00.000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                },
+                "examples": {
+                  "missing_email": {
+                    "summary": "Missing email",
+                    "value": {
+                      "message": "Validation error",
+                      "errors": [
+                        {
+                          "code": "invalid_type",
+                          "expected": "string",
+                          "received": "undefined",
+                          "path": [
+                            "body",
+                            "email"
+                          ],
+                          "message": "A valid email is required"
+                        }
+                      ]
+                    }
+                  },
+                  "invalid_email": {
+                    "summary": "Invalid email format",
+                    "value": {
+                      "message": "Validation error",
+                      "errors": [
+                        {
+                          "validation": "email",
+                          "code": "invalid_string",
+                          "path": [
+                            "body",
+                            "email"
+                          ],
+                          "message": "A valid email is required"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Invalid email or password"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Internal server error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Logout user",
+        "description": "Logs out the currently authenticated user by clearing authentication cookies.",
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logout successful",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Clear authentication cookies",
+                "schema": {
+                  "type": "string",
+                  "example": "accessToken=; HttpOnly; Secure; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "message": "Logout successful"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Unauthorized"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get current user profile",
+        "description": "Retrieves the profile information of the currently authenticated user.",
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                },
+                "examples": {
+                  "admin_profile": {
+                    "summary": "Admin user profile",
+                    "value": {
+                      "user": {
+                        "id": "cm123abc456",
+                        "email": "admin@example.com",
+                        "firstName": "Admin",
+                        "lastName": "User",
+                        "role": "ADMIN",
+                        "createdAt": "2024-01-15T10:30:00.000Z",
+                        "updatedAt": "2024-01-15T10:30:00.000Z"
+                      }
+                    }
+                  },
+                  "user_profile": {
+                    "summary": "Standard user profile",
+                    "value": {
+                      "user": {
+                        "id": "cm456def789",
+                        "email": "user@example.com",
+                        "firstName": "John",
+                        "lastName": "Doe",
+                        "role": "USER",
+                        "createdAt": "2024-01-15T10:30:00.000Z",
+                        "updatedAt": "2024-01-15T10:30:00.000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Unauthorized"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "summary": "Create a new user (Admin only)",
+        "description": "Creates a new user in the system. This operation is restricted to users with the ADMIN role. Passwords are automatically hashed using Argon2.",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "New user data to create",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequest"
+              },
+              "examples": {
+                "standard_user": {
+                  "summary": "Create standard user",
+                  "value": {
+                    "email": "newuser@example.com",
+                    "firstName": "Jane",
+                    "lastName": "Smith",
+                    "password": "SecurePassword123!",
+                    "role": "USER"
+                  }
+                },
+                "app1_user": {
+                  "summary": "Create APP1 user",
+                  "value": {
+                    "email": "app1user@example.com",
+                    "firstName": "App1",
+                    "lastName": "User",
+                    "password": "App1Password123!",
+                    "role": "APP1_USER"
+                  }
+                },
+                "admin_user": {
+                  "summary": "Create admin user",
+                  "value": {
+                    "email": "newadmin@example.com",
+                    "firstName": "New",
+                    "lastName": "Admin",
+                    "password": "AdminPassword123!",
+                    "role": "ADMIN"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUserResponse"
+                },
+                "example": {
+                  "message": "User created successfully",
+                  "user": {
+                    "id": "cm789ghi012",
+                    "email": "newuser@example.com",
+                    "firstName": "Jane",
+                    "lastName": "Smith",
+                    "role": "USER",
+                    "createdAt": "2024-01-15T12:00:00.000Z",
+                    "updatedAt": "2024-01-15T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                },
+                "examples": {
+                  "weak_password": {
+                    "summary": "Password too weak",
+                    "value": {
+                      "message": "Validation error",
+                      "errors": [
+                        {
+                          "code": "too_small",
+                          "minimum": 8,
+                          "type": "string",
+                          "inclusive": true,
+                          "exact": false,
+                          "path": [
+                            "body",
+                            "password"
+                          ],
+                          "message": "Password must be at least 8 characters long"
+                        }
+                      ]
+                    }
+                  },
+                  "invalid_role": {
+                    "summary": "Invalid role",
+                    "value": {
+                      "message": "Validation error",
+                      "errors": [
+                        {
+                          "received": "INVALID_ROLE",
+                          "code": "invalid_enum_value",
+                          "options": [
+                            "ADMIN",
+                            "APP1_USER",
+                            "APP2_USER",
+                            "USER"
+                          ],
+                          "path": [
+                            "body",
+                            "role"
+                          ],
+                          "message": "Invalid enum value. Expected 'ADMIN' | 'APP1_USER' | 'APP2_USER' | 'USER', received 'INVALID_ROLE'"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions (ADMIN role required)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Forbidden: Insufficient permissions"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - User with this email already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "An account with this email already exists."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Internal server error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "accessToken",
+        "description": "JWT cookie authentication. Access token is automatically included in secure cookies upon login."
+      }
+    },
+    "schemas": {
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User's email address",
+            "example": "admin@example.com",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "AdminPassword123!",
+            "minLength": 1
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Login successful",
+            "description": "Login confirmation message"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "CreateUserRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "firstName",
+          "lastName",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User's unique email address",
+            "example": "newuser@example.com"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "User's first name",
+            "example": "Jane",
+            "minLength": 2
+          },
+          "lastName": {
+            "type": "string",
+            "description": "User's last name",
+            "example": "Smith",
+            "minLength": 2
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password (will be hashed with Argon2)",
+            "example": "SecurePassword123!",
+            "minLength": 8
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          }
+        }
+      },
+      "CreateUserResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "User created successfully",
+            "description": "User creation confirmation message"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "UserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier",
+            "example": "cm123abc456"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User's email address",
+            "example": "admin@example.com"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "User's first name",
+            "example": "Admin"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "User's last name",
+            "example": "User"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Account creation date",
+            "example": "2024-01-15T10:30:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last modification date",
+            "example": "2024-01-15T10:30:00.000Z"
+          }
+        },
+        "description": "User object (password excluded for security reasons)"
+      },
+      "UserRole": {
+        "type": "string",
+        "enum": [
+          "ADMIN",
+          "APP1_USER",
+          "APP2_USER",
+          "USER"
+        ],
+        "description": "User role determining their permissions",
+        "example": "USER",
+        "default": "USER"
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "Operation completed successfully"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Descriptive error message",
+            "example": "An error occurred"
+          }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Validation error",
+            "description": "General validation error message"
+          },
+          "errors": {
+            "type": "array",
+            "description": "Detailed list of validation errors",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "description": "Error code",
+                  "example": "invalid_type"
+                },
+                "path": {
+                  "type": "array",
+                  "description": "Path to the field in error",
+                  "items": {
+                    "type": "string"
+                  },
+                  "example": [
+                    "body",
+                    "email"
+                  ]
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Specific error message",
+                  "example": "A valid email is required"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "cookieAuth": []
+    }
+  ]
+}
