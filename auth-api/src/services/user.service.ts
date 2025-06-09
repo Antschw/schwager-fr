@@ -28,6 +28,26 @@ export async function createUser(input: CreateUserInput) {
 }
 
 /**
+ * Deletes a user by their ID.
+ * @param id - The ID of the user to delete.
+ * @returns The deleted user object without the password, or null if user not found.
+ */
+export async function deleteUser(id: string) {
+    try {
+        const user = await prisma.user.delete({
+            where: {id},
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const {password: _, ...userWithoutPassword} = user;
+        return userWithoutPassword;
+    } catch (error) {
+        // If user doesn't exist, Prisma throws an error
+        return null;
+    }
+}
+
+/**
  * Finds a user by their email address.
  * @param email - The email of the user to find.
  * @returns The user object if found, otherwise null.

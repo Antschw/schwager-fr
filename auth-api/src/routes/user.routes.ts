@@ -1,5 +1,5 @@
 import express from 'express';
-import {createUserHandler} from '../controllers/user.controller';
+import {createUserHandler, deleteUserHandler} from '../controllers/user.controller';
 import validate from '../middleware/validate.middleware';
 import {createUserSchema} from '../schemas/user.schema';
 import {requireAuth, requireRole} from '../middleware/auth.middleware';
@@ -14,6 +14,14 @@ router.post(
     requireRole(Role.ADMIN),
     validate(createUserSchema),
     createUserHandler
+);
+
+// Delete a user by ID (only accessible by ADMIN)
+router.delete(
+    '/:id',
+    requireAuth,
+    requireRole(Role.ADMIN),
+    deleteUserHandler
 );
 
 export default router;

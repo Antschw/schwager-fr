@@ -347,6 +347,131 @@
         }
       }
     },
+    "/users/{id}": {
+      "delete": {
+        "summary": "Delete a user (Admin only)",
+        "description": "Deletes a user from the system by their ID. This operation is restricted to users with the ADMIN role. Admins cannot delete their own account.",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the user to delete",
+            "schema": {
+              "type": "string",
+              "example": "cm789ghi012"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User deleted successfully",
+                      "description": "User deletion confirmation message"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "User deleted successfully",
+                  "user": {
+                    "id": "cm789ghi012",
+                    "email": "user@example.com",
+                    "firstName": "Jane",
+                    "lastName": "Smith",
+                    "role": "USER",
+                    "createdAt": "2024-01-15T12:00:00.000Z",
+                    "updatedAt": "2024-01-15T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Cannot delete own account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "You cannot delete your own account."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions (ADMIN role required)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Forbidden: Insufficient permissions"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "User not found."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Internal server error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/users": {
       "post": {
         "summary": "Create a new user (Admin only)",
