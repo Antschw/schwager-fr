@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
+  color-scheme: light dark;
+}
+
+html.light { color-scheme: light; }
+html.dark  { color-scheme: dark; }
+
+body {
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.5s, color 0.5s;
+}

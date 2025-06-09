@@ -1,0 +1,33 @@
+{
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
+    "submitButton": "Sign In",
+    "loading": "Signing in...",
+    "forgotPassword": "Forgot password?",
+    "invalidEmail": "Please enter a valid email",
+    "passwordRequired": "Password is required",
+    "minPasswordLength": "Password must be at least 6 characters",
+    "successMessage": "Authentication successful",
+    "welcomeBack": "Welcome back to your account"
+  },
+  "common": {
+    "siteName": "schwager.fr",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode",
+    "language": "Language",
+    "french": "French",
+    "english": "English"
+  },
+  "errors": {
+    "networkError": "Network error. Please try again.",
+    "invalidCredentials": "Invalid email or password",
+    "serverError": "Server error. Please try again later.",
+    "authenticationFailed": "Authentication failed",
+    "loginFailed": "Login failed",
+    "connectionFailed": "Connection failed"
+  }
+}
