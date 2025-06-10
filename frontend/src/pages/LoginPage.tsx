@@ -11,8 +11,7 @@ import {
     Spinner
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
-import LanguageSwitcher from '../components/ui/LanguageSwitcher'
-import ThemeSwitcher from '../components/ui/ThemeSwitcher'
+import Header from '../components/ui/Header'
 import useAuth from '../hooks/useAuth'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 
@@ -157,17 +156,7 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-background to-default-100 flex flex-col">
             {/* Header with theme and language switchers */}
-            <motion.header
-                className="absolute top-0 right-0 p-4 z-10"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-            >
-                <div className="flex items-center gap-2">
-                    <LanguageSwitcher />
-                    <ThemeSwitcher />
-                </div>
-            </motion.header>
+            <Header />
 
             {/* Main content */}
             <main className={`flex-1 flex items-center justify-center p-4 ${isMobile ? 'pt-8' : ''}`}>
@@ -177,17 +166,6 @@ export default function LoginPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                 >
-                    {/* Site name */}
-                    <motion.div
-                        className={`text-center ${isMobile ? 'mb-6' : 'mb-8'}`}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.2, duration: 0.6 }}
-                    >
-                        <h1 className={`font-bold font-helvetica text-foreground ${isMobile ? 'text-3xl' : 'text-4xl md:text-5xl'}`}>
-                            {t('common.siteName') || 'schwager.fr'}
-                        </h1>
-                    </motion.div>
 
                     {/* Login card */}
                     <motion.div

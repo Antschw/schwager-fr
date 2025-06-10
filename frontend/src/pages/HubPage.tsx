@@ -2,8 +2,7 @@ import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { Button, Card, CardBody, CardHeader, Avatar, Chip } from '@heroui/react'
 import { Icon } from '@iconify/react'
-import LanguageSwitcher from '../components/ui/LanguageSwitcher'
-import ThemeSwitcher from '../components/ui/ThemeSwitcher'
+import Header from '../components/ui/Header'
 import useAuth from '../hooks/useAuth'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 
@@ -18,24 +17,8 @@ export default function HubPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-background to-default-100">
-            {/* Header */}
-            <motion.header
-                className="w-full p-4 flex justify-between items-center border-b border-default-200/50 backdrop-blur-sm bg-background/80"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-            >
-                <div className="flex items-center">
-                    <h1 className="text-xl sm:text-2xl font-bold font-helvetica text-foreground">
-                        {t('common.siteName') || 'schwager.fr'}
-                    </h1>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <LanguageSwitcher />
-                    <ThemeSwitcher />
-                </div>
-            </motion.header>
+            {/* Header avec le composant */}
+            <Header />
 
             {/* User Card - Mobile only */}
             {user && isMobile && (
@@ -292,7 +275,6 @@ export default function HubPage() {
                 >
                 </motion.div>
             </main>
-
         </div>
     )
 }
