@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   postgres:
-    image: postgres:13
+    image: postgres:16.9
     container_name: auth_db
     restart: always
     environment:

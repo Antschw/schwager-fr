@@ -1,0 +1,38 @@
+{
+  "login": {
+    "title": "Connexion",
+    "email": "Email",
+    "password": "Mot de passe",
+    "emailPlaceholder": "Entrez votre email",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "submitButton": "Se connecter",
+    "loading": "Connexion en cours...",
+    "forgotPassword": "Mot de passe oublié ?",
+    "invalidEmail": "Veuillez entrer un email valide",
+    "passwordRequired": "Le mot de passe est requis",
+    "minPasswordLength": "Le mot de passe doit contenir au moins 6 caractères",
+    "successMessage": "Authentification réussie",
+    "welcomeBack": "Bon retour sur votre compte"
+  },
+  "hub": {
+    "welcome": "Bienvenue sur le Hub",
+    "description": "Voici votre espace personnel"
+  },
+  "common": {
+    "siteName": "schwager.fr",
+    "lightMode": "Mode clair",
+    "darkMode": "Mode sombre",
+    "language": "Langue",
+    "french": "Français",
+    "english": "Anglais",
+    "logout": "Déconnexion"
+  },
+  "errors": {
+    "networkError": "Erreur de connexion. Veuillez réessayer.",
+    "invalidCredentials": "Email ou mot de passe incorrect",
+    "serverError": "Erreur serveur. Veuillez réessayer plus tard.",
+    "authenticationFailed": "Échec de l'authentification",
+    "loginFailed": "Échec de la connexion",
+    "connectionFailed": "Connexion échouée"
+  }
+}

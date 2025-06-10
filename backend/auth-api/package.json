@@ -7,9 +7,9 @@
     "dev": "cp .env.local .env && nodemon --watch 'src/**/*.ts' --exec ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "prisma db seed"
+    "prisma:generate": "../../auth-api/prisma generate",
+    "prisma:migrate": "../../auth-api/prisma migrate dev",
+    "prisma:seed": "../../auth-api/prisma db seed"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
