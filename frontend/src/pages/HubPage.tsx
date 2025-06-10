@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { Button, Card, CardBody, CardHeader, Avatar, Chip } from '@heroui/react'
 import { Icon } from '@iconify/react'
+import { useNavigate } from 'react-router-dom'
 import Header from '../components/ui/Header'
 import useAuth from '../hooks/useAuth'
 import { useMediaQuery } from '../hooks/useMediaQuery'
@@ -9,6 +10,7 @@ import { useMediaQuery } from '../hooks/useMediaQuery'
 export default function HubPage() {
     const { t } = useTranslation()
     const { user, logout } = useAuth()
+    const navigate = useNavigate()
     const isMobile = useMediaQuery('(max-width: 1023px)') // lg breakpoint
 
     const handleLogout = async () => {
@@ -87,19 +89,23 @@ export default function HubPage() {
                         whileTap={{ scale: 0.98 }}
                         transition={{ duration: 0.2 }}
                     >
-                        <Card className="hover:shadow-lg transition-shadow duration-200 cursor-pointer border border-default-200/50">
+                        <Card
+                            className="hover:shadow-lg transition-shadow duration-200 cursor-pointer border border-default-200/50"
+                            onPress={() => navigate('/plants')}
+                            isPressable
+                        >
                             <CardHeader className="flex gap-3">
-                                <div className="p-2 bg-primary/10 rounded-lg">
-                                    <Icon icon="lucide:bar-chart-3" className="text-primary text-2xl" />
+                                <div className="p-2 bg-success/10 rounded-lg">
+                                    <Icon icon="lucide:sprout" className="text-success text-2xl" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <p className="text-md font-semibold">Dashboard</p>
-                                    <p className="text-small text-default-500">Tableau de bord</p>
+                                    <p className="text-md font-semibold">Plant Monitor</p>
+                                    <p className="text-small text-default-500">Monitoring des plantes</p>
                                 </div>
                             </CardHeader>
                             <CardBody>
                                 <p className="text-default-600">
-                                    Consultez vos statistiques et métriques importantes
+                                    Surveillez l'humidité, l'arrosage et la croissance de vos plantes
                                 </p>
                             </CardBody>
                         </Card>
@@ -113,8 +119,8 @@ export default function HubPage() {
                     >
                         <Card className="hover:shadow-lg transition-shadow duration-200 cursor-pointer border border-default-200/50">
                             <CardHeader className="flex gap-3">
-                                <div className="p-2 bg-success/10 rounded-lg">
-                                    <Icon icon="lucide:trending-up" className="text-success text-2xl" />
+                                <div className="p-2 bg-primary/10 rounded-lg">
+                                    <Icon icon="lucide:trending-up" className="text-primary text-2xl" />
                                 </div>
                                 <div className="flex flex-col">
                                     <p className="text-md font-semibold">Analytics</p>
