@@ -3,10 +3,16 @@ import { Button } from '@heroui/react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@iconify/react'
+import { useEffect } from 'react'
 
 export default function ThemeSwitcher() {
     const { theme, setTheme } = useTheme()
     const { t } = useTranslation()
+
+    useEffect(() => {
+        document.documentElement.classList.remove('light', 'dark')
+        document.documentElement.classList.add(theme || 'light')
+    }, [theme])
 
     return (
         <motion.div

@@ -1,28 +1,12 @@
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { Button, Card, CardBody, CardHeader, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react'
+import { Button, Card, CardBody, CardHeader } from '@heroui/react'
 import { Icon } from '@iconify/react'
-import { useTheme } from '@heroui/use-theme'
+import LanguageSwitcher from '../components/ui/LanguageSwitcher'
+import ThemeSwitcher from '../components/ui/ThemeSwitcher'
 
 export default function HubPage() {
-    const { theme, setTheme } = useTheme()
-    const { i18n, t } = useTranslation()
-    const isDark = theme === 'dark'
-
-    const languages = [
-        { key: 'fr', label: t('common.french'), flag: '🇫🇷' },
-        { key: 'en', label: t('common.english'), flag: '🇺🇸' },
-    ];
-
-    const currentLanguage = languages.find(lang => lang.key === i18n.language) || languages[0];
-
-    const handleLanguageChange = (language: string) => {
-        i18n.changeLanguage(language);
-    };
-
-    const toggleTheme = () => {
-        setTheme(isDark ? 'light' : 'dark');
-    };
+    const { t } = useTranslation()
 
     const handleLogout = async () => {
         try {
@@ -56,73 +40,8 @@ export default function HubPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    {/* Language Switcher inline */}
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: 0.1 }}
-                    >
-                        <Dropdown>
-                            <DropdownTrigger>
-                                <Button
-                                    variant="light"
-                                    size="sm"
-                                    className="text-default-500 hover:text-default-700"
-                                    startContent={
-                                        <motion.span
-                                            whileHover={{ scale: 1.2 }}
-                                            transition={{ duration: 0.2 }}
-                                        >
-                                            {currentLanguage.flag}
-                                        </motion.span>
-                                    }
-                                >
-                                    {currentLanguage.key.toUpperCase()}
-                                </Button>
-                            </DropdownTrigger>
-                            <DropdownMenu
-                                aria-label="Language selection"
-                                onAction={(key) => handleLanguageChange(key as string)}
-                            >
-                                {languages.map((language) => (
-                                    <DropdownItem
-                                        key={language.key}
-                                        startContent={language.flag}
-                                        className={i18n.language === language.key ? "bg-primary/10" : ""}
-                                    >
-                                        {language.label}
-                                    </DropdownItem>
-                                ))}
-                            </DropdownMenu>
-                        </Dropdown>
-                    </motion.div>
-
-                    {/* Theme Switcher inline */}
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <Button
-                            isIconOnly
-                            variant="light"
-                            onPress={toggleTheme}
-                            aria-label={isDark ? t('common.lightMode') : t('common.darkMode')}
-                            className="text-default-500 hover:text-default-700"
-                        >
-                            <motion.div
-                                key={theme}
-                                initial={{ rotate: 0 }}
-                                animate={{ rotate: 360 }}
-                                transition={{ duration: 0.5 }}
-                            >
-                                <Icon
-                                    icon={isDark ? "lucide:sun" : "lucide:moon"}
-                                    className="w-5 h-5"
-                                />
-                            </motion.div>
-                        </Button>
-                    </motion.div>
+                    <LanguageSwitcher />
+                    <ThemeSwitcher />
 
                     {/* Logout Button */}
                     <Button
