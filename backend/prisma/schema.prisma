@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Define an enum for User Roles
+enum Role {
+  ADMIN
+  APP1_USER
+  APP2_USER
+  USER // A generic user role
+}
+
+model User {
+  id                String             @id @default(cuid())
+  email             String             @unique
+  firstName         String
+  lastName          String
+  password          String
+  role              Role               @default(USER)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  
+  // Plant monitoring relations
+  pumpActivations   PumpActivation[]
+  deviceSettingsUpdated DeviceSettings[]
+}
+
+// Plant-related models
+model Plant {
+  id              String           @id @default(cuid())
+  name            String
+  species         String?
+  location        String?
+  description     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  
+  // Relations
+  sensorReadings  SensorReading[]
+  photos          PlantPhoto[]
+  pumpActivations PumpActivation[]
+  deviceStatus    DeviceStatus[]
+  deviceSettings  DeviceSettings?
+}
+
+model SensorReading {
+  id            String   @id @default(cuid())
+  plantId       String
+  temperature   Float?
+  humidity      Float?
+  soilMoisture  Float?
+  lightLevel    Float?
+  ph            Float?
+  timestamp     DateTime @default(now())
+  
+  plant         Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  
+  @@index([plantId, timestamp])
+}
+
+model PlantPhoto {
+  id            String   @id @default(cuid())
+  plantId       String
+  filename      String
+  originalName  String
+  path          String
+  thumbnailPath String
+  size          Int
+  mimeType      String
+  description   String?
+  createdAt     DateTime @default(now())
+  
+  plant         Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  
+  @@index([plantId, createdAt])
+}
+
+model PumpActivation {
+  id          String   @id @default(cuid())
+  plantId     String
+  duration    Int      // Duration in seconds
+  reason      String?
+  triggeredBy String   // User ID or 'system'
+  timestamp   DateTime @default(now())
+  completed   Boolean  @default(false)
+  
+  plant       Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  user        User?    @relation(fields: [triggeredBy], references: [id])
+  
+  @@index([plantId, timestamp])
+}
+
+model DeviceStatus {
+  id          String   @id @default(cuid())
+  plantId     String   @unique
+  isOnline    Boolean  @default(false)
+  lastSeen    DateTime @default(now())
+  batteryLevel Float?
+  wifiSignal  Int?
+  version     String?
+  
+  plant       Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
+}
+
+model DeviceSettings {
+  id                 String   @id @default(cuid())
+  plantId            String   @unique
+  autoWatering       Boolean  @default(false)
+  moistureThreshold  Float    @default(30.0)
+  pumpDuration       Int      @default(10) // seconds
+  checkInterval      Int      @default(300) // seconds
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  updatedBy          String
+  
+  plant              Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  user               User     @relation(fields: [updatedBy], references: [id])
+}
