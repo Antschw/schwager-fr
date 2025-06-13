@@ -3,6 +3,8 @@
 .env.local
 .env.production
 .env.*.local
+.env.prod
+.env.dev
 
 # Dependencies
 node_modules/
@@ -29,5 +31,12 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# IA
+.claude
+
+# Cookies
+/backend/cookies.txt
+
 # Prisma
 prisma/migrations/*/migration.sql
+/backend/prisma/migrations/
