@@ -42,9 +42,6 @@ COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules/@prisma/client ./node_modules/@prisma/client
 COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
 
-# Copy public assets
-COPY --chown=nodejs:nodejs public ./public
-
 # Create uploads directory with proper permissions
 RUN mkdir -p /app/public/uploads/photos && chown -R nodejs:nodejs /app/public
 
