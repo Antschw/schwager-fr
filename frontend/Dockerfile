@@ -12,6 +12,16 @@ RUN npm install && npm cache clean --force
 # Copy source code
 COPY . .
 
+# Debug: Check file structure before build
+RUN echo "=== Checking file structure ===" && \
+    ls -la && \
+    echo "=== Checking src directory ===" && \
+    ls -la src/ && \
+    echo "=== Checking if main.tsx exists ===" && \
+    ls -la src/main.tsx && \
+    echo "=== Checking index.html ===" && \
+    cat index.html
+
 # Build application
 RUN npm run build
 
