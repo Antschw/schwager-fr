@@ -4,18 +4,15 @@
     "module": "commonjs",
     "rootDir": "./src",
     "outDir": "./dist",
-    "typeRoots": [
-      "./src/shared/types", "./node_modules/@types"],
+    "typeRoots": ["./src/shared/types", "./node_modules/@types"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "declaration": false,
+    "sourceMap": false
   },
-  "include": ["src/**/*",
-    "./src/shared/types/express.d.ts"
-  ],
-  "exclude": ["node_modules",
-    "../../auth-api/prisma"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
