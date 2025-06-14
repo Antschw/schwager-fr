@@ -213,8 +213,12 @@ jobs:
             docker-compose -f docker-compose.prod.yml up -d
           fi
 
-          # Run database migrations if backend changed
-          if [ "$BACKEND_CHANGED" == "true" ]; then
+          # Wait for services to be ready
+          echo "⏳ Waiting for services to start..."
+          sleep 30
+
+          # Run database migrations if backend changed or docker config changed
+          if [ "$BACKEND_CHANGED" == "true" ] || [ "$DOCKER_CHANGED" == "true" ]; then
             echo "🗄️ Running database migrations..."
             docker-compose -f docker-compose.prod.yml exec -T backend npx prisma migrate deploy || echo "⚠️ Migration failed or not needed"
           fi
@@ -228,7 +232,7 @@ jobs:
           sleep 10
           
           if [ "$BACKEND_CHANGED" == "true" ] || [ "$DOCKER_CHANGED" == "true" ]; then
-            if ! curl -f http://localhost:4000/api/auth/me > /dev/null 2>&1; then
+            if ! curl -f http://localhost:4000/api/healthcheck > /dev/null 2>&1; then
               echo "❌ Backend health check failed"
               exit 1
             fi

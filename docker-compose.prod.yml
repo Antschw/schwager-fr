@@ -1,18 +1,43 @@
 services:
+  # Database
+  postgres:
+    image: postgres:16
+    container_name: schwager-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: auth_db_prod
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: $$CPbVvWia6itv&dr35$$DU8cF9ueH*B
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - schwager-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_db_prod"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Backend API
   backend:
     image: ghcr.io/antschw/schwager-backend:latest
     container_name: schwager-backend
     restart: unless-stopped
-    network_mode: host
     environment:
       - NODE_ENV=production
       - PORT=4000
     env_file:
       - ./backend/.env.production
+    ports:
+      - "4000:4000"
     volumes:
       # Persistent uploads storage
       - uploads_data:/app/public/uploads
+    networks:
+      - schwager-network
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "const http = require('http'); const options = { hostname: 'localhost', port: 4000, path: '/api/healthcheck', timeout: 2000 }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.on('timeout', () => process.exit(1)); req.end();"]
       interval: 30s
@@ -38,7 +63,7 @@ services:
       retries: 3
       start_period: 30s
 
-  # Reverse Proxy (Production)
+  # Reverse Proxy
   nginx:
     image: nginx:alpine
     container_name: schwager-proxy
@@ -68,4 +93,6 @@ networks:
 
 volumes:
   uploads_data:
+    driver: local
+  postgres_data:
     driver: local
