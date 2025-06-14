@@ -162,9 +162,10 @@ jobs:
           # Change to project directory
           cd /var/www/schwager-fr
 
-          # Pull latest changes
+          # Pull latest changes (force reset to avoid conflicts)
           echo "📥 Pulling latest changes..."
-          git pull origin master
+          git fetch origin master
+          git reset --hard origin/master
 
           # Log in to GitHub Container Registry
           echo "🔑 Logging in to GitHub Container Registry..."
