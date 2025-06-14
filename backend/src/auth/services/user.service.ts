@@ -1,5 +1,5 @@
 import * as argon2 from 'argon2';
-import prisma from '../utils/prisma';
+import prisma from '../../shared/utils/prisma';
 import {z} from 'zod';
 import {createUserSchema} from '../schemas/user.schema';
 

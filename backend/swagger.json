@@ -1,0 +1,1519 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Schwager Plant Monitoring API",
+    "version": "2.0.0",
+    "description": "Complete plant monitoring system API with authentication, sensors data collection, photo management, streaming capabilities, and device control.",
+    "contact": {
+      "name": "API Support",
+      "email": "antoine@schwager.fr"
+    },
+    "license": {
+      "name": "ISC",
+      "url": "https://opensource.org/licenses/ISC"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://schwager.fr/api",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:4000/api",
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Authentication operations (login, logout, user profile)"
+    },
+    {
+      "name": "Users",
+      "description": "User management operations (creation, modification - admin only)"
+    },
+    {
+      "name": "Sensors",
+      "description": "Plant sensors data collection and retrieval"
+    },
+    {
+      "name": "Photos",
+      "description": "Plant photo upload and management"
+    },
+    {
+      "name": "Streaming",
+      "description": "Real-time video streaming from plant cameras"
+    },
+    {
+      "name": "Controls",
+      "description": "Remote device control (pump, irrigation, etc.)"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "summary": "Authenticate a user",
+        "description": "Authenticates a user with email and password. On success, sets secure cookies with access and refresh tokens.",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Logout user",
+        "description": "Logs out the currently authenticated user by clearing authentication cookies.",
+        "tags": ["Auth"],
+        "security": [{"cookieAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Logout successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get current user profile",
+        "description": "Retrieves the profile information of the currently authenticated user.",
+        "tags": ["Auth"],
+        "security": [{"cookieAuth": []}],
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/users": {
+      "get": {
+        "summary": "Get all users (Admin only)",
+        "description": "Retrieves a list of all users in the system. This operation is restricted to users with the ADMIN role.",
+        "tags": ["Users"],
+        "security": [{"cookieAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Users retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Users retrieved successfully"
+                    },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 3
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - ADMIN role required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new user (Admin only)",
+        "description": "Creates a new user in the system. This operation is restricted to users with the ADMIN role.",
+        "tags": ["Users"],
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - ADMIN role required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "User with this email already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/users/{id}": {
+      "delete": {
+        "summary": "Delete a user (Admin only)",
+        "description": "Deletes a user from the system by their ID. This operation is restricted to users with the ADMIN role.",
+        "tags": ["Users"],
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the user to delete",
+            "schema": {
+              "type": "string",
+              "example": "cm789ghi012"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User deleted successfully"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Cannot delete own account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - ADMIN role required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plants/sensors/data": {
+      "post": {
+        "summary": "Submit sensor data",
+        "description": "Receives sensor data from IoT devices (temperature, humidity, soil moisture, etc.)",
+        "tags": ["Sensors"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SensorDataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sensor data stored successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorDataResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid sensor data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get current sensor readings",
+        "description": "Retrieves the latest sensor readings for plants",
+        "tags": ["Sensors"],
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "plantId",
+            "in": "query",
+            "description": "Filter by specific plant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor data retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorReadingsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plants/sensors/history": {
+      "get": {
+        "summary": "Get sensor history",
+        "description": "Retrieves historical sensor data with optional filtering",
+        "tags": ["Sensors"],
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "plantId",
+            "in": "query",
+            "description": "Filter by plant ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "Start date for filtering (ISO 8601)",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "End date for filtering (ISO 8601)",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of records to return",
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "minimum": 1,
+              "maximum": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor history retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorReadingsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plants/photos/upload": {
+      "post": {
+        "summary": "Upload plant photo",
+        "description": "Uploads a photo of a plant. Automatically generates thumbnails.",
+        "tags": ["Photos"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "photo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Photo file (JPG, PNG, WebP - max 10MB)"
+                  },
+                  "plantId": {
+                    "type": "string",
+                    "description": "ID of the plant"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Optional photo description"
+                  }
+                },
+                "required": ["photo", "plantId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Photo uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhotoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid file or missing data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plants/photos": {
+      "get": {
+        "summary": "Get plant photos",
+        "description": "Retrieves a list of plant photos with pagination",
+        "tags": ["Photos"],
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "plantId",
+            "in": "query",
+            "description": "Filter by plant ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of photos per page",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of photos to skip",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Photos retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhotosListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plants/photos/{id}": {
+      "delete": {
+        "summary": "Delete photo",
+        "description": "Deletes a plant photo and its thumbnail",
+        "tags": ["Photos"],
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Photo ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Photo deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Photo not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plants/streaming/start": {
+      "post": {
+        "summary": "Start video stream",
+        "description": "Starts a real-time video stream from a plant camera",
+        "tags": ["Streaming"],
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StreamStartRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stream started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreamResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stream already active",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plants/streaming/stop": {
+      "post": {
+        "summary": "Stop video stream",
+        "description": "Stops an active video stream",
+        "tags": ["Streaming"],
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "plantId": {
+                    "type": "string",
+                    "description": "Plant ID"
+                  }
+                },
+                "required": ["plantId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stream stopped successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreamStopResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No active stream found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plants/streaming/status": {
+      "get": {
+        "summary": "Get streaming status",
+        "description": "Gets the status of active streams",
+        "tags": ["Streaming"],
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "plantId",
+            "in": "query",
+            "description": "Filter by plant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stream status retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreamStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plants/controls/pump": {
+      "post": {
+        "summary": "Trigger pump activation",
+        "description": "Remotely activates the irrigation pump for a specific duration",
+        "tags": ["Controls"],
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PumpControlRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pump activation triggered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PumpControlResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pump parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plants/controls/status": {
+      "get": {
+        "summary": "Get device status",
+        "description": "Retrieves the status of plant monitoring devices",
+        "tags": ["Controls"],
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "plantId",
+            "in": "query",
+            "description": "Filter by plant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Device status retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plants/controls/settings": {
+      "put": {
+        "summary": "Update device settings",
+        "description": "Updates automation settings for plant monitoring devices",
+        "tags": ["Controls"],
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceSettingsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settings updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceSettingsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "accessToken",
+        "description": "JWT cookie authentication"
+      }
+    },
+    "schemas": {
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "antoine@schwager.fr"
+          },
+          "password": {
+            "type": "string",
+            "example": "Tounou974"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Login successful"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "cm123abc456"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "antoine@schwager.fr"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Antoine"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Schwager"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["ADMIN", "APP1_USER", "APP2_USER", "USER"],
+            "example": "ADMIN"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "CreateUserRequest": {
+        "type": "object",
+        "required": ["email", "firstName", "lastName", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "newuser@schwager.fr"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Jean",
+            "minLength": 2
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Dupont",
+            "minLength": 2
+          },
+          "password": {
+            "type": "string",
+            "example": "SecurePassword123!",
+            "minLength": 8
+          },
+          "role": {
+            "type": "string",
+            "enum": ["ADMIN", "APP1_USER", "APP2_USER", "USER"],
+            "default": "USER",
+            "example": "USER"
+          }
+        }
+      },
+      "CreateUserResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "User created successfully"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "SensorDataRequest": {
+        "type": "object",
+        "required": ["plantId"],
+        "properties": {
+          "plantId": {
+            "type": "string",
+            "example": "plant-001"
+          },
+          "temperature": {
+            "type": "number",
+            "example": 22.5,
+            "description": "Temperature in Celsius"
+          },
+          "humidity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "example": 65,
+            "description": "Relative humidity percentage"
+          },
+          "soilMoisture": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "example": 45,
+            "description": "Soil moisture percentage"
+          },
+          "lightLevel": {
+            "type": "number",
+            "minimum": 0,
+            "example": 850,
+            "description": "Light level in lux"
+          },
+          "ph": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 14,
+            "example": 6.8,
+            "description": "Soil pH level"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Optional timestamp (defaults to current time)"
+          }
+        }
+      },
+      "SensorDataResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SensorReading"
+          }
+        }
+      },
+      "SensorReading": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "plantId": {
+            "type": "string"
+          },
+          "temperature": {
+            "type": "number",
+            "nullable": true
+          },
+          "humidity": {
+            "type": "number",
+            "nullable": true
+          },
+          "soilMoisture": {
+            "type": "number",
+            "nullable": true
+          },
+          "lightLevel": {
+            "type": "number",
+            "nullable": true
+          },
+          "ph": {
+            "type": "number",
+            "nullable": true
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SensorReadingsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SensorReading"
+            }
+          }
+        }
+      },
+      "PhotoResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/PlantPhoto"
+          }
+        }
+      },
+      "PlantPhoto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "plantId": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string",
+            "example": "/uploads/photos/plant-1234567890.jpg"
+          },
+          "thumbnailPath": {
+            "type": "string",
+            "example": "/uploads/photos/plant-1234567890_thumb.jpg"
+          },
+          "size": {
+            "type": "integer",
+            "description": "File size in bytes"
+          },
+          "mimeType": {
+            "type": "string",
+            "example": "image/jpeg"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PhotosListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "photos": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PlantPhoto"
+                }
+              },
+              "totalCount": {
+                "type": "integer"
+              },
+              "hasMore": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "StreamStartRequest": {
+        "type": "object",
+        "required": ["plantId"],
+        "properties": {
+          "plantId": {
+            "type": "string",
+            "example": "plant-001"
+          },
+          "quality": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "default": "medium"
+          },
+          "rtspUrl": {
+            "type": "string",
+            "format": "uri",
+            "example": "rtsp://192.168.1.100:554/stream1",
+            "description": "Optional RTSP camera URL"
+          }
+        }
+      },
+      "StreamResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "plantId": {
+                "type": "string"
+              },
+              "quality": {
+                "type": "string"
+              },
+              "startTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "streamUrl": {
+                "type": "string",
+                "example": "/api/plants/streaming/ws/plant-001"
+              }
+            }
+          }
+        }
+      },
+      "StreamStopResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "plantId": {
+                "type": "string"
+              },
+              "duration": {
+                "type": "integer",
+                "description": "Stream duration in milliseconds"
+              }
+            }
+          }
+        }
+      },
+      "StreamStatusResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "activeStreams": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "plantId": {
+                      "type": "string"
+                    },
+                    "startTime": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "quality": {
+                      "type": "string"
+                    },
+                    "viewers": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              },
+              "totalActive": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "PumpControlRequest": {
+        "type": "object",
+        "required": ["plantId", "duration"],
+        "properties": {
+          "plantId": {
+            "type": "string",
+            "example": "plant-001"
+          },
+          "duration": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 300,
+            "example": 30,
+            "description": "Pump activation duration in seconds"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Manual watering",
+            "description": "Optional reason for activation"
+          }
+        }
+      },
+      "PumpControlResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Pump activation triggered"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "activationId": {
+                "type": "string"
+              },
+              "plantId": {
+                "type": "string"
+              },
+              "duration": {
+                "type": "integer"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "DeviceStatusResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "devices": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "plantId": {
+                      "type": "string"
+                    },
+                    "isOnline": {
+                      "type": "boolean"
+                    },
+                    "lastSeen": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "batteryLevel": {
+                      "type": "number",
+                      "nullable": true
+                    },
+                    "wifiSignal": {
+                      "type": "integer",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "recentActivations": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "plantId": {
+                      "type": "string"
+                    },
+                    "duration": {
+                      "type": "integer"
+                    },
+                    "reason": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DeviceSettingsRequest": {
+        "type": "object",
+        "required": ["plantId", "settings"],
+        "properties": {
+          "plantId": {
+            "type": "string",
+            "example": "plant-001"
+          },
+          "settings": {
+            "type": "object",
+            "properties": {
+              "autoWatering": {
+                "type": "boolean",
+                "example": true,
+                "description": "Enable automatic watering"
+              },
+              "moistureThreshold": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "example": 30,
+                "description": "Soil moisture threshold for auto-watering"
+              },
+              "pumpDuration": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 300,
+                "example": 15,
+                "description": "Auto-watering duration in seconds"
+              },
+              "checkInterval": {
+                "type": "integer",
+                "minimum": 60,
+                "example": 300,
+                "description": "Sensor check interval in seconds"
+              }
+            }
+          }
+        }
+      },
+      "DeviceSettingsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Device settings updated"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "plantId": {
+                "type": "string"
+              },
+              "autoWatering": {
+                "type": "boolean"
+              },
+              "moistureThreshold": {
+                "type": "number"
+              },
+              "pumpDuration": {
+                "type": "integer"
+              },
+              "checkInterval": {
+                "type": "integer"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Operation completed successfully"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "An error occurred"
+          }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Validation error"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "cookieAuth": []
+    }
+  ]
+}

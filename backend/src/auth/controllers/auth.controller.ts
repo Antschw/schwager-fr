@@ -2,7 +2,7 @@ import {Request, Response} from 'express';
 import * as argon2 from 'argon2';
 import {findUserByEmail} from '../services/user.service';
 import {generateAccessToken, generateRefreshToken} from '../services/auth.service';
-import config from '../config';
+import config from '../../shared/config';
 
 /**
  * Handles the login request.

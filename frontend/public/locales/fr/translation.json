@@ -10,7 +10,6 @@
     "forgotPassword": "Mot de passe oublié ?",
     "invalidEmail": "Veuillez entrer un email valide",
     "passwordRequired": "Le mot de passe est requis",
-    "minPasswordLength": "Le mot de passe doit contenir au moins 6 caractères",
     "successMessage": "Authentification réussie",
     "welcomeBack": "Bon retour sur votre compte"
   },
@@ -34,5 +33,70 @@
     "authenticationFailed": "Échec de l'authentification",
     "loginFailed": "Échec de la connexion",
     "connectionFailed": "Connexion échouée"
+  },
+  "plant": {
+    "title": "Monitoring Plantes",
+    "back": "Retour",
+    "timeRange": "Période",
+    "periods": {
+      "24h": "24 Heures",
+      "7d": "7 Jours",
+      "30d": "30 Jours",
+      "all": "Tout"
+    },
+    "tabs": {
+      "dashboard": "Tableau de bord",
+      "gallery": "Galerie complète",
+      "settings": "Paramètres"
+    },
+    "sections": {
+      "moisture": "Humidité du sol",
+      "watering": "Statistiques d'arrosage",
+      "gallery": "Galerie des plantes",
+      "timeline": "Chronologie de croissance",
+      "systemSettings": "Paramètres du système"
+    },
+    "stats": {
+      "activations": "Activations",
+      "totalDuration": "Durée totale",
+      "waterUsed": "Eau utilisée",
+      "tankLevel": "Niveau du réservoir",
+      "dailyUsage": "Utilisation d'eau quotidienne"
+    },
+    "actions": {
+      "refresh": "Actualiser les données",
+      "waterNow": "Arroser maintenant",
+      "capturePhoto": "Prendre une photo",
+      "systemSettings": "Paramètres système"
+    },
+    "messages": {
+      "noMoistureData": "Aucune donnée d'humidité disponible",
+      "noPumpData": "Aucune donnée de pompe disponible",
+      "noImages": "Aucune image disponible",
+      "tankGood": "Niveau du réservoir correct",
+      "tankLow": "Le réservoir doit être rempli bientôt",
+      "plantWatered": "Plante arrosée à ce moment",
+      "wateringThreshold": "Seuil d'arrosage",
+      "settingsDesc": "Configurez les paramètres de votre système de monitoring de plantes Raspberry Pi. Cette section inclurait les seuils d'humidité, les horaires d'arrosage et les paramètres de caméra.",
+      "settingsComingSoon": "Panneau de paramètres disponible prochainement"
+    },
+    "settings": {
+      "thresholds": {
+        "title": "Seuils d'humidité",
+        "desc": "Configuration des niveaux critiques"
+      },
+      "scheduling": {
+        "title": "Planification",
+        "desc": "Horaires d'arrosage automatique"
+      },
+      "camera": {
+        "title": "Caméra",
+        "desc": "Paramètres de capture photo"
+      },
+      "connectivity": {
+        "title": "Connectivité",
+        "desc": "Configuration réseau et API"
+      }
+    }
   }
 }

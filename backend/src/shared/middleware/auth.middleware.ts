@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from 'express';
 import {Role} from '@prisma/client';
-import {verifyToken} from '../services/auth.service';
-import {findUserById} from '../services/user.service';
+import {verifyToken} from '../../auth/services/auth.service';
+import {findUserById} from '../../auth/services/user.service';
 import config from '../config';
 
 /**

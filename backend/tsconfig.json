@@ -5,7 +5,7 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "typeRoots": [
-      "./src/types", "./node_modules/@types"],
+      "./src/shared/types", "./node_modules/@types"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -13,7 +13,7 @@
     "resolveJsonModule": true
   },
   "include": ["src/**/*",
-    "./src/types/express.d.ts"
+    "./src/shared/types/express.d.ts"
   ],
   "exclude": ["node_modules",
     "../../auth-api/prisma"

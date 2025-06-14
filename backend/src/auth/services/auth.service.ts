@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import config from '../config';
+import config from '../../shared/config';
 
 /**
  * Generates an access token for a user.

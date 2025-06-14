@@ -10,7 +10,6 @@
     "forgotPassword": "Forgot password?",
     "invalidEmail": "Please enter a valid email",
     "passwordRequired": "Password is required",
-    "minPasswordLength": "Password must be at least 6 characters",
     "successMessage": "Authentication successful",
     "welcomeBack": "Welcome back to your account"
   },
@@ -34,5 +33,70 @@
     "authenticationFailed": "Authentication failed",
     "loginFailed": "Login failed",
     "connectionFailed": "Connection failed"
+  },
+  "plant": {
+    "title": "Plant Monitoring",
+    "back": "Back",
+    "timeRange": "Time Range",
+    "periods": {
+      "24h": "24 Hours",
+      "7d": "7 Days",
+      "30d": "30 Days",
+      "all": "All Time"
+    },
+    "tabs": {
+      "dashboard": "Dashboard",
+      "gallery": "Full Gallery",
+      "settings": "Settings"
+    },
+    "sections": {
+      "moisture": "Soil Moisture",
+      "watering": "Watering Statistics",
+      "gallery": "Plant Gallery",
+      "timeline": "Growth Timeline",
+      "systemSettings": "System Settings"
+    },
+    "stats": {
+      "activations": "Activations",
+      "totalDuration": "Total Duration",
+      "waterUsed": "Water Used",
+      "tankLevel": "Tank Level",
+      "dailyUsage": "Daily Water Usage"
+    },
+    "actions": {
+      "refresh": "Refresh Data",
+      "waterNow": "Water Now",
+      "capturePhoto": "Capture Photo",
+      "systemSettings": "System Settings"
+    },
+    "messages": {
+      "noMoistureData": "No moisture data available",
+      "noPumpData": "No pump data available",
+      "noImages": "No images available",
+      "tankGood": "Tank level is good",
+      "tankLow": "Tank needs refilling soon",
+      "plantWatered": "Plant was watered at this time",
+      "wateringThreshold": "Watering Threshold",
+      "settingsDesc": "Configure your Raspberry Pi plant monitoring system settings here. This section would include moisture thresholds, watering schedules, and camera settings.",
+      "settingsComingSoon": "Settings panel coming soon"
+    },
+    "settings": {
+      "thresholds": {
+        "title": "Moisture Thresholds",
+        "desc": "Configure critical levels"
+      },
+      "scheduling": {
+        "title": "Scheduling",
+        "desc": "Automatic watering schedules"
+      },
+      "camera": {
+        "title": "Camera",
+        "desc": "Photo capture settings"
+      },
+      "connectivity": {
+        "title": "Connectivity",
+        "desc": "Network and API configuration"
+      }
+    }
   }
 }

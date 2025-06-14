@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import HubPage from './pages/HubPage'
+import PlantPage from './pages/PlantPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import useAuth from './hooks/useAuth'
 import { Spinner } from '@heroui/react'
@@ -49,6 +50,16 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <HubPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Page Plant Monitoring */}
+                <Route
+                    path="/plants"
+                    element={
+                        <ProtectedRoute>
+                            <PlantPage />
                         </ProtectedRoute>
                     }
                 />

@@ -1,8 +1,8 @@
 import express from 'express';
 import {getMeHandler, loginHandler, logoutHandler} from '../controllers/auth.controller';
-import validate from '../middleware/validate.middleware';
+import validate from '../../shared/middleware/validate.middleware';
 import {loginSchema} from '../schemas/auth.schema';
-import {requireAuth} from '../middleware/auth.middleware';
+import {requireAuth} from '../../shared/middleware/auth.middleware';
 
 const router = express.Router();
 
