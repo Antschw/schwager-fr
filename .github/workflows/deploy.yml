@@ -203,20 +203,14 @@ jobs:
             docker pull ${{ env.IMAGE_PREFIX }}-frontend:latest
           fi
 
+          # Stop existing services to avoid port conflicts
+          echo "🛑 Stopping existing services..."
+          docker-compose -f docker-compose.prod.yml down || echo "⚠️ No existing services running"
+
           # Deploy services
-          if [ "$BACKEND_CHANGED" == "true" ] || [ "$DOCKER_CHANGED" == "true" ]; then
-            echo "🔄 Redeploying backend..."
-            docker-compose -f docker-compose.prod.yml up -d --no-deps backend
-          fi
-
-          if [ "$FRONTEND_CHANGED" == "true" ] || [ "$DOCKER_CHANGED" == "true" ]; then
-            echo "🔄 Redeploying frontend..."
-            docker-compose -f docker-compose.prod.yml up -d --no-deps frontend
-          fi
-
-          if [ "$NGINX_CHANGED" == "true" ] || [ "$DOCKER_CHANGED" == "true" ]; then
-            echo "🔄 Redeploying nginx..."
-            docker-compose -f docker-compose.prod.yml up -d --no-deps nginx
+          echo "🚀 Starting services..."
+          if [ "$BACKEND_CHANGED" == "true" ] || [ "$FRONTEND_CHANGED" == "true" ] || [ "$NGINX_CHANGED" == "true" ] || [ "$DOCKER_CHANGED" == "true" ]; then
+            docker-compose -f docker-compose.prod.yml up -d
           fi
 
           # Run database migrations if backend changed
