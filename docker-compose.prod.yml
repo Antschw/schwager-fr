@@ -1,7 +1,7 @@
 services:
   # Backend API
   backend:
-    image: ghcr.io/antoine-schwager/schwager-backend:latest
+    image: ghcr.io/antschw/schwager-backend:latest
     container_name: schwager-backend
     restart: unless-stopped
     environment:
@@ -25,7 +25,7 @@ services:
 
   # Frontend React App
   frontend:
-    image: ghcr.io/antoine-schwager/schwager-frontend:latest
+    image: ghcr.io/antschw/schwager-frontend:latest
     container_name: schwager-frontend
     restart: unless-stopped
     ports:
