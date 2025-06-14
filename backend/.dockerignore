@@ -12,9 +12,9 @@ yarn-error.log*
 .env.production
 
 # Development files
-src
+# src - Need source code for Docker build!
 *.md
-tsconfig.json
+# tsconfig.json - Need for TypeScript build!
 .gitignore
 docker-compose.yml
 

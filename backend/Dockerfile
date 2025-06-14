@@ -16,14 +16,6 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
-# Debug: Check file structure before build
-RUN echo "=== Checking file structure ===" && \
-    ls -la && \
-    echo "=== Checking src directory ===" && \
-    ls -la src/ && \
-    echo "=== Finding TypeScript files ===" && \
-    find src -name "*.ts" -type f
-
 # Build TypeScript
 RUN npm run build
 

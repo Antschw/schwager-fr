@@ -8,12 +8,12 @@ yarn-error.log*
 dist
 build
 
-# Development files
-src
+# Development files  
+# src - Need source code for Docker build!
 *.md
-tsconfig.json
-tsconfig.*.json
-vite.config.ts
+# tsconfig.json - Need for TypeScript build!
+# tsconfig.*.json - Need for TypeScript build!
+# vite.config.ts - Need for Vite build!
 eslint.config.js
 .gitignore
 
