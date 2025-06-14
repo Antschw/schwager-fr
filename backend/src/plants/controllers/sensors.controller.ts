@@ -6,9 +6,11 @@ import prisma from '../../shared/utils/prisma';
 const sensorDataSchema = z.object({
     plantId: z.string(),
     temperature: z.number().optional(),
-    humidity: z.number().min(0).max(100).optional(),
     soilMoisture: z.number().min(0).max(100).optional(),
+    airHumidity: z.number().min(0).max(100).optional(),
+    atmosphericPressure: z.number().min(800).max(1200).optional(),
     lightLevel: z.number().min(0).optional(),
+    waterLevel: z.number().min(0).max(100).optional(),
     ph: z.number().min(0).max(14).optional(),
     timestamp: z.string().datetime().optional(),
 });

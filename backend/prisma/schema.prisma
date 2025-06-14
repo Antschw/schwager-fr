@@ -19,50 +19,56 @@ enum Role {
 }
 
 model User {
-  id                String             @id @default(cuid())
-  email             String             @unique
-  firstName         String
-  lastName          String
-  password          String
-  role              Role               @default(USER)
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  
+  id        String   @id @default(cuid())
+  email     String   @unique
+  firstName String
+  lastName  String
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Plant monitoring relations
-  pumpActivations   PumpActivation[]
+  pumpActivations       PumpActivation[]
   deviceSettingsUpdated DeviceSettings[]
+  actionLogs            ActionLog[]
+  deviceCalibrations    DeviceCalibration[]
 }
 
 // Plant-related models
 model Plant {
-  id              String           @id @default(cuid())
-  name            String
-  species         String?
-  location        String?
-  description     String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  
+  id          String   @id @default(cuid())
+  name        String
+  species     String?
+  location    String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   // Relations
-  sensorReadings  SensorReading[]
-  photos          PlantPhoto[]
-  pumpActivations PumpActivation[]
-  deviceStatus    DeviceStatus[]
-  deviceSettings  DeviceSettings?
+  sensorReadings    SensorReading[]
+  photos            PlantPhoto[]
+  pumpActivations   PumpActivation[]
+  deviceStatus      DeviceStatus[]
+  deviceSettings    DeviceSettings?
+  actionLogs        ActionLog[]
+  deviceCalibration DeviceCalibration?
 }
 
 model SensorReading {
-  id            String   @id @default(cuid())
-  plantId       String
-  temperature   Float?
-  humidity      Float?
-  soilMoisture  Float?
-  lightLevel    Float?
-  ph            Float?
-  timestamp     DateTime @default(now())
-  
-  plant         Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
-  
+  id                  String   @id @default(cuid())
+  plantId             String
+  temperature         Float? // Capteur de température
+  soilMoisture        Float? // Capteur d'humidité du sol
+  airHumidity         Float? // Capteur d'humidité de l'air
+  atmosphericPressure Float? // Capteur de pression atmosphérique
+  lightLevel          Float? // Capteur de luminosité
+  waterLevel          Float? // Capteur ultrasonique niveau d'eau réservoir
+  ph                  Float? // TODO Capteur pH (conservé pour compatibilité et amélioration future)
+  timestamp           DateTime @default(now())
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+
   @@index([plantId, timestamp])
 }
 
@@ -77,50 +83,115 @@ model PlantPhoto {
   mimeType      String
   description   String?
   createdAt     DateTime @default(now())
-  
-  plant         Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
-  
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+
   @@index([plantId, createdAt])
 }
 
 model PumpActivation {
   id          String   @id @default(cuid())
   plantId     String
-  duration    Int      // Duration in seconds
+  duration    Int // Duration in seconds
   reason      String?
-  triggeredBy String   // User ID or 'system'
+  triggeredBy String // User ID or 'system'
   timestamp   DateTime @default(now())
   completed   Boolean  @default(false)
-  
-  plant       Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
-  user        User?    @relation(fields: [triggeredBy], references: [id])
-  
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  user  User? @relation(fields: [triggeredBy], references: [id])
+
   @@index([plantId, timestamp])
 }
 
 model DeviceStatus {
-  id          String   @id @default(cuid())
-  plantId     String   @unique
-  isOnline    Boolean  @default(false)
-  lastSeen    DateTime @default(now())
+  id           String   @id @default(cuid())
+  plantId      String   @unique
+  isOnline     Boolean  @default(false)
+  lastSeen     DateTime @default(now())
   batteryLevel Float?
-  wifiSignal  Int?
-  version     String?
-  
-  plant       Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  wifiSignal   Int?
+  version      String?
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
 }
 
 model DeviceSettings {
-  id                 String   @id @default(cuid())
-  plantId            String   @unique
-  autoWatering       Boolean  @default(false)
-  moistureThreshold  Float    @default(30.0)
-  pumpDuration       Int      @default(10) // seconds
-  checkInterval      Int      @default(300) // seconds
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  updatedBy          String
-  
-  plant              Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
-  user               User     @relation(fields: [updatedBy], references: [id])
+  id                String   @id @default(cuid())
+  plantId           String   @unique
+  autoWatering      Boolean  @default(false)
+  moistureThreshold Float    @default(30.0)
+  pumpDuration      Int      @default(10) // seconds
+  checkInterval     Int      @default(300) // seconds
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  updatedBy         String
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [updatedBy], references: [id])
+}
+
+// Enum pour les types d'actions sur les dispositifs
+enum ActionType {
+  PUMP_ACTIVATION // Activation de la pompe à eau
+  SPRAYER_ACTIVATION // Activation du vaporisateur/brumisateur
+  PHOTO_CAPTURE // Prise de photo/vidéo
+  SENSOR_CALIBRATION // Calibration des capteurs
+  SYSTEM_RESTART // Redémarrage du système
+}
+
+// Log des actions effectuées sur les dispositifs (pompe, vaporisateur, etc.)
+model ActionLog {
+  id           String     @id @default(cuid())
+  plantId      String
+  actionType   ActionType
+  duration     Int? // Durée en secondes (pour pompe/vaporisateur)
+  intensity    Float? // Intensité/puissance (0-100%)
+  reason       String? // Raison de l'action (automatique, manuel, programmé)
+  triggeredBy  String // User ID ou 'system'
+  metadata     Json? // Données supplémentaires (paramètres, capteurs déclencheurs, etc.)
+  timestamp    DateTime   @default(now())
+  completed    Boolean    @default(false)
+  success      Boolean? // null = en cours, true = réussi, false = échec
+  errorMessage String? // Message d'erreur si échec
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  user  User? @relation(fields: [triggeredBy], references: [id])
+
+  @@index([plantId, timestamp])
+  @@index([actionType, timestamp])
+}
+
+// Calibration des capteurs
+model DeviceCalibration {
+  id                    String @id @default(cuid())
+  plantId               String @unique
+  // Calibration capteur de température
+  temperatureOffset     Float? @default(0.0)
+  temperatureMultiplier Float? @default(1.0)
+  // Calibration capteur humidité sol
+  soilMoistureMin       Float? @default(0.0) // Valeur capteur pour sol complètement sec
+  soilMoistureMax       Float? @default(100.0) // Valeur capteur pour sol saturé
+  // Calibration capteur humidité air
+  airHumidityOffset     Float? @default(0.0)
+  airHumidityMultiplier Float? @default(1.0)
+  // Calibration capteur pression
+  pressureOffset        Float? @default(0.0)
+  pressureMultiplier    Float? @default(1.0)
+  // Calibration capteur luminosité
+  lightOffset           Float? @default(0.0)
+  lightMultiplier       Float? @default(1.0)
+  // Calibration capteur niveau d'eau (ultrasonique)
+  waterLevelMin         Float? @default(0.0) // Distance pour réservoir vide
+  waterLevelMax         Float? @default(100.0) // Distance pour réservoir plein
+  // pH calibration
+  phOffset              Float? @default(0.0)
+  phMultiplier          Float? @default(1.0)
+
+  lastCalibrated DateTime @default(now())
+  calibratedBy   String
+  notes          String? // Notes de calibration
+
+  plant Plant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [calibratedBy], references: [id])
 }
