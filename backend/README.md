@@ -358,18 +358,6 @@ npx prisma studio
 - **Documentation** : `http://localhost:4000/api-docs`
 - **Prisma Studio** : `http://localhost:5555` (après `npx prisma studio`)
 
-## 🤝 Contribution
-
-1. Fork le projet
-2. Créer une branche feature (`git checkout -b feature/nouvelle-fonctionnalite`)
-3. Commit les changements (`git commit -m 'Ajouter nouvelle fonctionnalité'`)
-4. Push vers la branche (`git push origin feature/nouvelle-fonctionnalite`)
-5. Ouvrir une Pull Request
-
-## 📝 License
-
-ISC
-
 ---
 
 **Schwager Plant Monitoring System** - Backend API v1.0.0
