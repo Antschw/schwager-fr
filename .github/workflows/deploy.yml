@@ -2,9 +2,9 @@ name: Auto Deploy to VPS
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 env:
   REGISTRY: ghcr.io
@@ -134,7 +134,7 @@ jobs:
   # Deploy to VPS
   deploy:
     needs: [detect-changes, build-backend, build-frontend]
-    if: always() && github.ref == 'refs/heads/main' && (needs.build-backend.result == 'success' || needs.build-backend.result == 'skipped') && (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped')
+    if: always() && github.ref == 'refs/heads/master' && (needs.build-backend.result == 'success' || needs.build-backend.result == 'skipped') && (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped')
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -164,7 +164,7 @@ jobs:
 
           # Pull latest changes
           echo "📥 Pulling latest changes..."
-          git pull origin main
+          git pull origin master
 
           # Log in to GitHub Container Registry
           echo "🔑 Logging in to GitHub Container Registry..."
