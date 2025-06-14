@@ -1,7 +1,7 @@
 import express from 'express';
-import {createUserHandler, deleteUserHandler, getAllUsersHandler} from '../controllers/user.controller';
+import {createUserHandler, deleteUserHandler, getAllUsersHandler, adminChangePasswordHandler} from '../controllers/user.controller';
 import validate from '../../shared/middleware/validate.middleware';
-import {createUserSchema} from '../schemas/user.schema';
+import {createUserSchema, adminChangePasswordSchema} from '../schemas/user.schema';
 import {requireAuth, requireRole} from '../../shared/middleware/auth.middleware';
 import {Role} from '@prisma/client';
 
@@ -31,6 +31,15 @@ router.delete(
     requireAuth,
     requireRole(Role.ADMIN),
     deleteUserHandler
+);
+
+// Change a user's password (only accessible by ADMIN)
+router.patch(
+    '/:id/change-password',
+    requireAuth,
+    requireRole(Role.ADMIN),
+    validate(adminChangePasswordSchema),
+    adminChangePasswordHandler
 );
 
 export default router;

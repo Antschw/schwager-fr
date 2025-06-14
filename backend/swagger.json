@@ -6,11 +6,7 @@
     "description": "Complete plant monitoring system API with authentication, sensors data collection, photo management, streaming capabilities, and device control.",
     "contact": {
       "name": "API Support",
-      "email": "antoine@schwager.fr"
-    },
-    "license": {
-      "name": "ISC",
-      "url": "https://opensource.org/licenses/ISC"
+      "email": "geoge.marcelin@outlook.com"
     }
   },
   "servers": [
@@ -122,6 +118,114 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update current user profile",
+        "description": "Updates the profile information of the currently authenticated user.",
+        "tags": ["Auth"],
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateProfileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/change-password": {
+      "patch": {
+        "summary": "Change current user password",
+        "description": "Changes the password of the currently authenticated user.",
+        "tags": ["Auth"],
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid current password or validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -303,6 +407,87 @@
           },
           "400": {
             "description": "Cannot delete own account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - ADMIN role required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/users/{id}/change-password": {
+      "patch": {
+        "summary": "Change user password (Admin only)",
+        "description": "Changes the password of a specific user. This operation is restricted to users with the ADMIN role.",
+        "tags": ["Users"],
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the user",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminChangePasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User password changed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data or trying to change own password",
             "content": {
               "application/json": {
                 "schema": {
@@ -852,11 +1037,11 @@
           "email": {
             "type": "string",
             "format": "email",
-            "example": "antoine@schwager.fr"
+            "example": "example@schwager.fr"
           },
           "password": {
             "type": "string",
-            "example": "Tounou974"
+            "example": "ThisIsAnExamplePassword123!"
           }
         }
       },
@@ -882,11 +1067,11 @@
           "email": {
             "type": "string",
             "format": "email",
-            "example": "antoine@schwager.fr"
+            "example": "example@schwager.fr"
           },
           "firstName": {
             "type": "string",
-            "example": "Antoine"
+            "example": "Bob"
           },
           "lastName": {
             "type": "string",
@@ -969,35 +1154,42 @@
           },
           "temperature": {
             "type": "number",
-            "example": 22.5,
+            "example": 23.2,
             "description": "Temperature in Celsius"
-          },
-          "humidity": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 100,
-            "example": 65,
-            "description": "Relative humidity percentage"
           },
           "soilMoisture": {
             "type": "number",
             "minimum": 0,
             "maximum": 100,
-            "example": 45,
+            "example": 42,
             "description": "Soil moisture percentage"
+          },
+          "airHumidity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "example": 68,
+            "description": "Air humidity percentage"
+          },
+          "atmosphericPressure": {
+            "type": "number",
+            "minimum": 800,
+            "maximum": 1200,
+            "example": 1013.25,
+            "description": "Atmospheric pressure in hPa"
           },
           "lightLevel": {
             "type": "number",
             "minimum": 0,
-            "example": 850,
+            "example": 1250,
             "description": "Light level in lux"
           },
-          "ph": {
+          "waterLevel": {
             "type": "number",
             "minimum": 0,
-            "maximum": 14,
-            "example": 6.8,
-            "description": "Soil pH level"
+            "maximum": 100,
+            "example": 85,
+            "description": "Water reservoir level percentage"
           },
           "timestamp": {
             "type": "string",
@@ -1022,34 +1214,58 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "example": "clq1abc123xyz"
           },
           "plantId": {
-            "type": "string"
+            "type": "string",
+            "example": "plant-001"
           },
           "temperature": {
             "type": "number",
-            "nullable": true
-          },
-          "humidity": {
-            "type": "number",
-            "nullable": true
+            "nullable": true,
+            "example": 23.2,
+            "description": "Temperature in Celsius"
           },
           "soilMoisture": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "example": 42,
+            "description": "Soil moisture percentage"
+          },
+          "airHumidity": {
+            "type": "number",
+            "nullable": true,
+            "example": 68,
+            "description": "Air humidity percentage"
+          },
+          "atmosphericPressure": {
+            "type": "number",
+            "nullable": true,
+            "example": 1013.25,
+            "description": "Atmospheric pressure in hPa"
           },
           "lightLevel": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "example": 1250,
+            "description": "Light level in lux"
+          },
+          "waterLevel": {
+            "type": "number",
+            "nullable": true,
+            "example": 85,
+            "description": "Water reservoir level percentage"
           },
           "ph": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "description": "Soil pH level (future feature)"
           },
           "timestamp": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00Z"
           }
         }
       },
@@ -1506,6 +1722,80 @@
                 }
               }
             }
+          }
+        }
+      },
+      "UpdateProfileRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@example.com",
+            "description": "New email address"
+          },
+          "firstName": {
+            "type": "string",
+            "minLength": 2,
+            "example": "John",
+            "description": "New first name"
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 2,
+            "example": "Doe", 
+            "description": "New last name"
+          }
+        },
+        "additionalProperties": false,
+        "description": "At least one field must be provided"
+      },
+      "UpdateProfileResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Profile updated successfully"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "required": ["currentPassword", "newPassword"],
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "description": "Current password for verification"
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 8,
+            "example": "newSecurePassword123",
+            "description": "New password (minimum 8 characters)"
+          }
+        }
+      },
+      "AdminChangePasswordRequest": {
+        "type": "object",
+        "required": ["newPassword"],
+        "properties": {
+          "newPassword": {
+            "type": "string",
+            "minLength": 8,
+            "example": "newSecurePassword123",
+            "description": "New password for the user (minimum 8 characters)"
+          }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Operation completed successfully"
           }
         }
       }
