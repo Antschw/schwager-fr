@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/schwager
+  IMAGE_PREFIX: ghcr.io/antschw/schwager
 
 jobs:
   # Detect which parts of the application have changed
